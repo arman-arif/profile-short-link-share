@@ -1,61 +1,170 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Dual Authentication System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 12.x application with dual authentication system for Users and Admins, featuring Bootstrap frontend, Google reCAPTCHA protection, user referral system with social media integration.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Dual Authentication System**
+  - Separate authentication for Users and Admins
+  - Single unified login page with automatic user type detection
+  - Google reCAPTCHA v2 protection on login and registration
+  - Progressive login attempt blocking (3 attempts = 15 min block, 6 attempts = 45 min block)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **User Management**
+  - User self-registration with email verification
+  - Admin-generated accounts via seeder
+  - Admin dashboard with user list, pagination, and management controls
+  - User profile with personal information and avatar
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Referral System**
+  - Unique short links for each user
+  - Social media integration with dynamic Open Graph meta tags
+  - Public user profile pages accessible via short links
 
-## Learning Laravel
+- **Frontend**
+  - Bootstrap 5.x for responsive UI
+  - Clean, modern interface
+  - Mobile-friendly design
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## System Requirements
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP >= 8.2
+- Composer
+- Node.js >= 22.x
+- MySQL/SQLite
+- Google reCAPTCHA v2 keys
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+### 1. Clone and Setup
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone <repository-url>
+cd <project-folder>
+composer install
+pnpm install / npm install
+```
 
-### Premium Partners
+### 2. Environment Configuration
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Contributing
+### 3. Database Configuration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Edit `.env` file with your database credentials:
 
-## Code of Conduct
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Google reCAPTCHA Setup
 
-## Security Vulnerabilities
+1. Visit [Google reCAPTCHA](https://www.google.com/recaptcha/)
+2. Register your domain and get Site Key & Secret Key
+3. Add to `.env`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+CAPTCHA_SITEKEY=your_site_key_here
+CAPTCHA_SECRET=your_secret_key_here
+```
 
-## License
+### 5. Database Migration and Seeding
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+This will create:
+- Users table for customer registration
+- Admins table for admin accounts
+- Default admin account (see seeder for credentials)
+
+### 6. Storage Setup
+
+```bash
+php artisan storage:link
+```
+
+### 7. Build Frontend Assets
+
+```bash
+pnpm build / npm run build
+# or for development
+pnpm dev / npm run dev
+```
+
+### 8. Start Development Server
+
+```bash
+php artisan serve
+```
+
+Visit `http://localhost:8000` to access the application.
+
+## Default Admin Credentials
+
+After running the seeder, use these credentials to access admin panel:
+
+- **Email**: admin@example.com
+- **Password**: password
+
+*Note: Change these credentials immediately after first login*
+
+## Authentication Flow
+
+### User Registration
+1. User visits registration page
+2. Fills form with: name, email, password, about, avatar
+3. Completes Google reCAPTCHA
+4. Account created instantly (no email verification required)
+5. Unique short link generated for social sharing
+
+### Login Process
+1. Single login page for both users and admins
+2. Google reCAPTCHA verification required
+3. System automatically detects user type (user vs admin)
+4. Failed login attempt tracking:
+   - 3 failed attempts = 15 minute block
+   - 6 failed attempts = 45 minute block
+5. Redirect to appropriate dashboard
+
+## Admin Features
+
+### User Management Dashboard
+- Paginated list of all registered users
+- Search and filter capabilities
+- User actions:
+  - View user details
+  - Diable/Enable users
+  - Delete user accounts
+
+
+## Social Media Sharing
+
+### Short Link Generation
+Each user gets a unique short link format:
+```
+https://yourdomain.com/u/{unique_code}
+```
+
+### Social Media Integration
+When shared on social platforms, the link displays:
+- User's name
+- Email
+- About description
+- Avatar image
+
+### Usage
+1. User copies their unique link from dashboard
+2. Shares on social media platforms
+3. Visitors click link and see user's profile
+4. Call-to-action button leads to registration form
