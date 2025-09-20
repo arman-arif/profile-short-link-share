@@ -11,5 +11,5 @@ Route::group(['middleware' => 'auth:admin', 'as' => 'admin.', 'prefix' => 'admin
     Route::delete('user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
     Route::patch('user/{user}/{status}', [UserController::class, 'toggleStatus'])->name('user.status');
     Route::get('profile', [DashboardController::class, 'index'])->name('profile');
-    Route::get('logout', [LoginController::class, 'adminLogout'])->name('logout');
+    Route::post('logout', [LoginController::class, 'adminLogout'])->name('logout');
 });
