@@ -26,5 +26,7 @@
             @yield('content')
         </main>
     </div>
+
+    <x-alerts />
 </body>
 </html>

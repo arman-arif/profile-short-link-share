@@ -24,21 +24,21 @@
 </head>
 
 <body>
-<div class="wrapper">
-    <x-admin.navbar />
+    <div class="wrapper">
+        <x-admin.navbar />
 
-    <div class="main">
-        <x-admin.header/>
+        <div class="main">
+            <x-admin.header/>
 
-        <main class="content">
-            @yield('content')
-        </main>
+            <main class="content">
+                @yield('content')
+            </main>
 
-        <x-admin.footer/>
+            <x-admin.footer/>
+        </div>
     </div>
-</div>
 
-<x-admin.alerts />
+    <x-alerts />
 </body>
 
 </html>

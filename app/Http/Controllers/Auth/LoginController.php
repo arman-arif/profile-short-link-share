@@ -86,6 +86,12 @@ class LoginController extends Controller
             return redirect()->intended('/admin/dashboard');
         }
 
+        $user = $this->guard()->user();
+        if ($user->is_disabled) {
+            $this->guard()->logout();
+            return redirect('/login')->withErrors(['email' => 'Your account has been disabled. Please contact support.']);
+        }
+
         return $request->wantsJson()
             ? new JsonResponse([], 204)
             : redirect()->intended($this->redirectPath());
@@ -121,22 +127,5 @@ class LoginController extends Controller
     protected function guard($guard = 'web')
     {
         return Auth::guard($guard);
-    }
-
-    public function adminLogout(Request $request)
-    {
-        $this->guard('admin')->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        if ($response = $this->loggedOut($request)) {
-            return $response;
-        }
-
-        return $request->wantsJson()
-            ? new JsonResponse([], 204)
-            : redirect('/');
     }
 }
