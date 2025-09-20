@@ -1,0 +1,13 @@
+<?php
+
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use Illuminate\Support\Facades\Route;
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('users', [UserController::class, 'index'])->name('users');
+    Route::delete('user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::patch('user/{user}/{status}', [UserController::class, 'toggleStatus'])->name('user.status');
+    Route::get('profile', [DashboardController::class, 'index'])->name('profile');
+});
