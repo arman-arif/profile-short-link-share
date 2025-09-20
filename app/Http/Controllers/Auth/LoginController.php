@@ -122,4 +122,21 @@ class LoginController extends Controller
     {
         return Auth::guard($guard);
     }
+
+    public function adminLogout(Request $request)
+    {
+        $this->guard('admin')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+            ? new JsonResponse([], 204)
+            : redirect('/');
+    }
 }
