@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -27,6 +29,7 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/';
+    protected $whoLogin = 'user';
 
     /**
      * Create a new controller instance.
@@ -67,5 +70,56 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
+
+        if ($this->whoLogin == 'admin') {
+            return redirect()->intended('/admin/dashboard');
+        }
+
+        return $request->wantsJson()
+            ? new JsonResponse([], 204)
+            : redirect()->intended($this->redirectPath());
+    }
+
+    protected function attemptLogin(Request $request)
+    {
+        $adminAttempt =  $this->guard('admin')->attempt(
+            $this->credentials($request), $request->boolean('remember')
+        );
+
+        if ($adminAttempt) {
+            $this->whoLogin = 'admin';
+            return $adminAttempt;
+        }
+
+        return $this->guard()->attempt(
+            $this->credentials($request), $request->boolean('remember')
+        );
+    }
+
+    protected function validateLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+            'g-recaptcha-response' => 'required|captcha'
+        ], [
+            'g-recaptcha-response' => 'Invalid reCaptcha response.'
+        ]);
+    }
+
+    protected function guard($guard = 'web')
+    {
+        return Auth::guard($guard);
     }
 }

@@ -50,8 +50,12 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:customers', 'unique:admins'],
+            'about' => ['required', 'string', 'max:1000'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'g-recaptcha-response' => 'required|captcha'
+        ], [
+            'g-recaptcha-response' => 'Invalid reCaptcha response.'
         ]);
     }
 
@@ -59,14 +63,19 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\Models\User
+     * @return User
      */
     protected function create(array $data)
     {
+        $data['avatar'] = $data['avatar']->store('avatars', 'public');
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'about' => $data['about'],
+            'avatar' => $data['avatar'],
+            'short_code' => substr(md5(uniqid(rand(), true)), 0, 6)
         ]);
     }
 }

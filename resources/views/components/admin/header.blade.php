@@ -11,15 +11,19 @@
                 </a>
 
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                    <img src="" class="avatar img-fluid rounded me-1" alt="Charles Hall" /> <span class="text-dark">User Name</span>
+                    <img src="{{ asset('images/avatar-placeholder.png') }}" class="avatar img-fluid rounded me-1" alt="Admin" />
+                    <span class="text-dark">{{ auth()->user()?->name }}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="{{ route('admin.profile') }}">
+                    {{--<a class="dropdown-item" href="{{ route('admin.profile') }}">
                         <i class="align-middle me-1" data-feather="user"></i>
                         Profile
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Log out</a>
+                    <div class="dropdown-divider"></div>--}}
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button class="dropdown-item">Log out</button>
+                    </form>
                 </div>
             </li>
         </ul>

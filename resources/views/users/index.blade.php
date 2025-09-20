@@ -40,6 +40,7 @@
                                         <form action="{{ route('admin.user.status', [$user, $user->is_disabled ? 'enable' : 'disable']) }}" method="POST" class="d-inline">
                                             <button class="btn {{ $user->is_disabled ? 'text-success' : 'text-danger' }}"
                                                onclick="return confirm('Are you sure? You want to {{ $user->is_disabled ? 'enable' : 'disable' }} this user?') || event.stopImmediatePropagation()"
+                                                    data-bs-toggle="tooltip" title="{{ $user->is_disabled ? 'Enable' : 'Disable' }} User"
                                             >
                                                 <i class="align-middle" data-feather="power"></i>
                                             </button>
@@ -51,6 +52,7 @@
                                             @method('DELETE')
                                             <button class="btn"
                                                     onclick="return confirm('Are you sure? You want to delete this user?') || event.stopImmediatePropagation()"
+                                                    data-bs-toggle="tooltip" title="Delete User"
                                             >
                                                 <i class="align-middle" data-feather="trash-2"></i>
                                             </button>

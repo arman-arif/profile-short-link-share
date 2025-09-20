@@ -42,17 +42,37 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            {!! app('captcha')->display() !!}
+                            @error('g-recaptcha-response')
+                            <span class="text-danger small mt-2" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+
                         <div class="d-flex justify-content-between mb-0">
                             <button type="submit" class="btn btn-primary px-5">
                                 {{ __('Login') }}
                             </button>
 
-                            @if (Route::has('password.request'))
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Your Password?') }}
-                                </a>
-                            @endif
+                            <div>
+                                @if (Route::has('password.request'))
+                                    <a class="btn btn-link" href="{{ route('password.request') }}">
+                                        {{ __('Forgot Your Password?') }}
+                                    </a>
+                                @endif
+                            </div>
                         </div>
+
+                        @if (Route::has('register'))
+                            <div class="text-center mt-3">
+                                {{ __("Don't have an account?") }}
+                                <a href="{{ route('register') }}">
+                                    {{ __("Register here") }}
+                                </a>
+                            </div>
+                        @endif
                     </form>
                 </div>
             </div>
