@@ -2,6 +2,8 @@
 
 A Laravel 12.x application with dual authentication system for Users and Admins, featuring Bootstrap frontend, Google reCAPTCHA protection, user referral system with social media integration.
 
+Live Preview: [http://profile-card.aarif.co](http://profile-card.aarif.co/)
+
 ## Features
 
 - **Dual Authentication System**
