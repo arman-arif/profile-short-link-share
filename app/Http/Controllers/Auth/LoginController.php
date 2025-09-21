@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class LoginController extends Controller
 {
@@ -28,8 +29,12 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
-    protected $whoLogin = 'user';
+    protected string $redirectTo = '/';
+    protected string $whoLogin = 'user';
+    protected array $rateLimitsTiers = [
+        [3, 15], // 3 attempts for 15 minutes
+        [6, 45], // 6 attempts for 45 minutes
+    ];
 
     /**
      * Create a new controller instance.
@@ -49,8 +54,7 @@ class LoginController extends Controller
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
+        if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
             return $this->sendLockoutResponse($request);
@@ -64,9 +68,9 @@ class LoginController extends Controller
             return $this->sendLoginResponse($request);
         }
 
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
+        // If the login attempt was unsuccessful, we will increase the number of attempts
+        // to log in and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts, they will get locked out.
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
@@ -127,5 +131,57 @@ class LoginController extends Controller
     protected function guard($guard = 'web')
     {
         return Auth::guard($guard);
+    }
+
+    protected function hasTooManyLoginAttempts(Request $request)
+    {
+        return $this->limiter()->tooManyAttempts(
+            $this->throttleKey($request), $this->maxAttempts($request)
+        );
+    }
+
+
+    private function getAttemptKey(Request $request)
+    {
+        return 'failed_login_attempts:' . $this->throttleKey($request);
+    }
+
+    protected function getAttempts(Request $request)
+    {
+        return Cache::get($this->getAttemptKey($request), 0);
+    }
+
+    protected function maxAttempts(Request $request)
+    {
+        $attempts = $this->getAttempts($request);
+        if ($attempts > $this->rateLimitsTiers[0][0]) {
+            return $this->rateLimitsTiers[1][0];
+        }
+        return $this->rateLimitsTiers[0][0];
+    }
+
+    public function decayMinutes(Request $request)
+    {
+        $attempts = $this->getAttempts($request);
+        if ($attempts > $this->rateLimitsTiers[0][1]) {
+            return $this->rateLimitsTiers[1][1];
+        }
+        return $this->rateLimitsTiers[0][1];
+    }
+
+    protected function incrementLoginAttempts(Request $request)
+    {
+        $this->limiter()->hit(
+            $this->throttleKey($request), $this->decayMinutes($request) * 60
+        );
+        Cache::remember($this->getAttemptKey($request), 45, function () use ($request) {
+            return $this->getAttempts($request) + 1;
+        });
+    }
+
+    protected function clearLoginAttempts(Request $request)
+    {
+        $this->limiter()->clear($this->throttleKey($request));
+        Cache::forget($this->getAttemptKey($request));
     }
 }
