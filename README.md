@@ -1,4 +1,4 @@
-# Laravel Dual Authentication System
+# Laravel Profile Card With Dual Authentication System
 
 A Laravel 12.x application with dual authentication system for Users and Admins, featuring Bootstrap frontend, Google reCAPTCHA protection, user referral system with social media integration.
 
